@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f index.html
+          test -f Dockerfile
+          test -f compose.yaml
+
+      - name: Check website heading
+        run: |
+          grep -q "BATTECHNO CI/CD LAB" index.html
+
+      - name: Validate Docker Compose
+        run: docker compose config -q
+
+      - name: Build Docker image
+        run: docker build -t battechno-ci-demo:lab .
